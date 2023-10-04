@@ -1,38 +1,17 @@
-import mssql from 'mssql';
-import { sqlconfig } from "../config/config";
+import joi from 'joi';
 
-export default class Connection {
-  private pool: Promise<mssql.ConnectionPool>;
-  constructor() {
-    this.pool = this.getConnection();
-  }
-  async getConnection(): Promise<mssql.ConnectionPool> {
-    const pool = mssql.connect(sqlconfig) as Promise<mssql.ConnectionPool>;
-    return pool;
-  }
-  createRequest(request: mssql.Request, data: { [c: string]: string }) {
-    const keys = Object.keys(data);
-    keys.map((keyName) => {
-      const keyValue = data[keyName];
+export const registerSchema = joi.object({
 
-      request.input(keyName, keyValue);
-    });
 
-    return request;
-  }
+    name:joi.string().required().min(5),
+    email:joi.string().email().exist().required(),
+    password:joi.string().required().min(8)
+})
 
-  async exec(procedureName: string, data: { [c: string]: string } = {}) {
-    let pool = await this.pool;
-    let request = (await pool.request()) as mssql.Request;
 
-    request = this.createRequest(request, data);
+export const loginSchema = joi.object({
 
-    const result = await request.execute(procedureName);
-    return result;
-  }
+    email:joi.string().email().required(),
+    password:joi.string().required().min(8),
 
-  async query(query: string) {
-    const results = await (await this.pool).request().query(query);
-    return results;
-  }
-}
+})
