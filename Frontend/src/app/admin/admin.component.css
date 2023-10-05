@@ -1,0 +1,12 @@
+.container {
+  display: flex;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+
+  background: #f9e57c;
+}
